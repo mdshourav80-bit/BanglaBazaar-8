@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Ace - Casino Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a0f00 0%, #2d1b00 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            color: #ffcc00;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .game-container {
+            background: radial-gradient(circle at 30% 30%, #2d5a27 0%, #123510 100%);
+            border: 8px solid #8B5A2B;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .multiplier-bar {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 2px solid #444;
+        }
+
+        .multiplier-item {
+            font-weight: bold;
+            color: #ffcc00;
+            font-size: 16px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            color: #000;
+            height: 120px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.8);
+            cursor: default;
+            transition: all 0.3s ease;
+            border: 3px solid #ddd;
+        }
+
+        .card.spinning {
+            animation: spin 0.5s linear;
+        }
+
+        .card.winner {
+            background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
+        }
+
+        @keyframes spin {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(90deg); }
+            100% { transform: rotateY(0deg); }
+        }
+
+        .stats-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #555;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+            font-size: 16px;
+        }
+
+        .stat-label {
+            color: #ccc;
+        }
+
+        .stat-value {
+            color: #ffcc00;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .stat-value.win {
+            color: #55ff55;
+        }
+
+        .balance-display {
+            font-size: 24px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bet-control {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #555;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .bet-control label {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .bet-control select {
+            width: 100%;
+            padding: 8px;
+            background: #333;
+            color: #ffcc00;
+            border: 1px solid #666;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .spin-btn {
+            width: 100%;
+            background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%);
+            border: none;
+            padding: 18px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #cc7a00, 0 8px 20px rgba(0,0,0,0.4);
+            transition: all 0.1s;
+            margin-bottom: 15px;
+        }
+
+        .spin-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 0 #cc7a00, 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .spin-btn:active:not(:disabled) {
+            box-shadow: 0 3px 0 #cc7a00;
+            transform: translateY(5px);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: #444;
+            border: 1px solid #666;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #555;
+            border-color: #888;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 16px;
+            margin-top: 15px;
+            min-height: 20px;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+
+        .message.win {
+            color: #55ff55;
+        }
+
+        .message.lose {
+            color: #ff6666;
+        }
+
+        .stats-table {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #555;
+            font-size: 14px;
+        }
+
+        .stats-table-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .stats-table-row:last-child {
+            border-bottom: none;
+        }
+
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .game-over.show {
+            display: flex;
+        }
+
+        .game-over-content {
+            background: #1a0f00;
+            border: 5px solid #8B5A2B;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .game-over-content h2 {
+            color: #ffcc00;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .game-over-content p {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .game-over-content button {
+            background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%);
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .game-container {
+                padding: 20px;
+            }
+
+            .card {
+                height: 100px;
+                font-size: 24px;
+            }
+
+            .spin-btn {
+                font-size: 20px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="header">
+            <h1>🎰 SUPER ACE</h1>
+            <p>Match cards to win big!</p>
+        </div>
+
+        <div class="game-container">
+            <div class="multiplier-bar">
+                <div class="multiplier-item">x1</div>
+                <div class="multiplier-item">x2</div>
+                <div class="multiplier-item">x5</div>
+            </div>
+
+            <div class="card-grid">
+                <div class="card" id="card1">?</div>
+                <div class="card" id="card2">?</div>
+                <div class="card" id="card3">?</div>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stat-row">
+                    <span class="stat-label">💰 Balance</span>
+                    <span class="balance-display">Tk <span id="balance">1000</span></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">🎯 Current Bet</span>
+                    <span class="stat-value">Tk <span id="bet-display">10</span></span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">🏆 Last Win</span>
+                    <span class="stat-value win">Tk <span id="win-amount">0</span></span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="bet-control">
+                    <label>SELECT BET</label>
+                    <select id="bet-selector">
+                        <option value="5">Tk 5</option>
+                        <option value="10" selected>Tk 10</option>
+                        <option value="25">Tk 25</option>
+                        <option value="50">Tk 50</option>
+                        <option value="100">Tk 100</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="spin-btn" id="spin-btn" onclick="playGame()">SPIN</button>
+
+            <div class="message" id="message"></div>
+
+            <div class="action-buttons">
+                <button class="action-btn" onclick="resetGame()">Reset</button>
+                <button class="action-btn" onclick="toggleStats()">Stats</button>
+            </div>
+
+            <div class="stats-table" id="stats-table" style="display: none;">
+                <div class="stats-table-row">
+                    <span>Total Spins</span>
+                    <span id="total-spins">0</span>
+                </div>
+                <div class="stats-table-row">
+                    <span>Total Wins</span>
+                    <span id="total-wins">0</span>
+                </div>
+                <div class="stats-table-row">
+                    <span>Win Rate</span>
+                    <span id="win-rate">0%</span>
+                </div>
+                <div class="stats-table-row">
+                    <span>Total Bet</span>
+                    <span id="total-bet">0</span>
+                </div>
+                <div class="stats-table-row">
+                    <span>Total Winnings</span>
+                    <span id="total-winnings">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over" id="game-over">
+        <div class="game-over-content">
+            <h2>Game Over!</h2>
+            <p>You ran out of balance</p>
+            <p id="final-balance">Final Balance: Tk 0</p>
+            <button onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            balance: parseInt(localStorage.getItem('balance')) || 1000,
+            bet: 10,
+            totalSpins: parseInt(localStorage.getItem('totalSpins')) || 0,
+            totalWins: parseInt(localStorage.getItem('totalWins')) || 0,
+            totalBet: parseInt(localStorage.getItem('totalBet')) || 0,
+            totalWinnings: parseInt(localStorage.getItem('totalWinnings')) || 0,
+            lastWin: 0,
+            isSpinning: false
+        };
+
+        const cardsPool = ['A♠', 'K♦', 'Q♥', 'J♣', '10♠', 'A♦', 'K♠', 'Q♦'];
+
+        // Initialize UI
+        function initUI() {
+            updateBalanceDisplay();
+            document.getElementById('bet-selector').addEventListener('change', (e) => {
+                gameState.bet = parseInt(e.target.value);
+                document.getElementById('bet-display').innerText = gameState.bet;
+            });
+        }
+
+        function updateBalanceDisplay() {
+            document.getElementById('balance').innerText = gameState.balance;
+            document.getElementById('bet-display').innerText = gameState.bet;
+        }
+
+        function saveState() {
+            localStorage.setItem('balance', gameState.balance);
+            localStorage.setItem('totalSpins', gameState.totalSpins);
+            localStorage.setItem('totalWins', gameState.totalWins);
+            localStorage.setItem('totalBet', gameState.totalBet);
+            localStorage.setItem('totalWinnings', gameState.totalWinnings);
+        }
+
+        function playGame() {
+            if (gameState.isSpinning) return;
+            if (gameState.balance < gameState.bet) {
+                showMessage('Insufficient balance!', 'lose');
+                return;
+            }
+
+            gameState.isSpinning = true;
+            document.getElementById('spin-btn').disabled = true;
+
+            // Deduct bet
+            gameState.balance -= gameState.bet;
+            gameState.totalSpins++;
+            gameState.totalBet += gameState.bet;
+            updateBalanceDisplay();
+
+            // Clear previous message
+            clearMessage();
+
+            // Spin animation
+            const cards = ['card1', 'card2', 'card3'];
+            cards.forEach(cardId => {
+                document.getElementById(cardId).classList.add('spinning');
+                document.getElementById(cardId).innerText = '?';
+            });
+
+            // Simulate spin time
+            setTimeout(() => {
+                // Draw random cards
+                const c1 = cardsPool[Math.floor(Math.random() * cardsPool.length)];
+                const c2 = cardsPool[Math.floor(Math.random() * cardsPool.length)];
+                const c3 = cardsPool[Math.floor(Math.random() * cardsPool.length)];
+
+                // Display cards
+                document.getElementById('card1').innerText = c1;
+                document.getElementById('card2').innerText = c2;
+                document.getElementById('card3').innerText = c3;
+
+                cards.forEach(cardId => {
+                    document.getElementById(cardId).classList.remove('spinning');
+                });
+
+                // Check win condition
+                let winAmount = 0;
+                let winType = '';
+
+                if (c1 === c2 && c2 === c3) {
+                    // Three of a kind - 5x multiplier
+                    winAmount = gameState.bet * 5;
+                    winType = 'jackpot';
+                    cards.forEach(cardId => {
+                        document.getElementById(cardId).classList.add('winner');
+                    });
+                    showMessage('🎊 JACKPOT! Three of a kind! 🎊', 'win');
+                } else if (c1 === c2 || c2 === c3 || c1 === c3) {
+                    // Two of a kind - 2x multiplier
+                    winAmount = gameState.bet * 2;
+                    winType = 'pair';
+                    if (c1 === c2 || c1 === c3) {
+                        document.getElementById('card1').classList.add('winner');
+                        if (c1 === c2) document.getElementById('card2').classList.add('winner');
+                        if (c1 === c3) document.getElementById('card3').classList.add('winner');
+                    } else {
+                        document.getElementById('card2').classList.add('winner');
+                        document.getElementById('card3').classList.add('winner');
+                    }
+                    showMessage('✨ You won! 2 cards matched! ✨', 'win');
+                } else {
+                    showMessage('❌ No match. Try again!', 'lose');
+                }
+
+                // Update balance
+                if (winAmount > 0) {
+                    gameState.balance += winAmount;
+                    gameState.lastWin = winAmount;
+                    gameState.totalWins++;
+                    gameState.totalWinnings += winAmount;
+                    document.getElementById('win-amount').innerText = winAmount;
+                } else {
+                    document.getElementById('win-amount').innerText = '0';
+                }
+
+                updateBalanceDisplay();
+                saveState();
+
+                // Check game over
+                if (gameState.balance <= 0) {
+                    showGameOver();
+                }
+
+                gameState.isSpinning = false;
+                document.getElementById('spin-btn').disabled = false;
+
+                // Remove winner class after 2 seconds
+                setTimeout(() => {
+                    cards.forEach(cardId => {
+                        document.getElementById(cardId).classList.remove('winner');
+                    });
+                }, 2000);
+            }, 1000);
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.innerText = text;
+            messageEl.className = 'message ' + type;
+        }
+
+        function clearMessage() {
+            document.getElementById('message').innerText = '';
+            document.getElementById('message').className = 'message';
+        }
+
+        function showGameOver() {
+            document.getElementById('final-balance').innerText = `Final Balance: Tk ${gameState.balance}`;
+            document.getElementById('game-over').classList.add('show');
+        }
+
+        function resetGame() {
+            gameState.balance = 1000;
+            gameState.totalSpins = 0;
+            gameState.totalWins = 0;
+            gameState.totalBet = 0;
+            gameState.totalWinnings = 0;
+            gameState.lastWin = 0;
+            gameState.isSpinning = false;
+
+            document.getElementById('game-over').classList.remove('show');
+            document.getElementById('spin-btn').disabled = false;
+            clearMessage();
+            document.getElementById('win-amount').innerText = '0';
+
+            const cards = ['card1', 'card2', 'card3'];
+            cards.forEach(cardId => {
+                document.getElementById(cardId).innerText = '?';
+                document.getElementById(cardId).classList.remove('winner');
+            });
+
+            updateBalanceDisplay();
+            saveState();
+        }
+
+        function toggleStats() {
+            const statsTable = document.getElementById('stats-table');
+            if (statsTable.style.display === 'none') {
+                statsTable.style.display = 'block';
+                updateStats();
+            } else {
+                statsTable.style.display = 'none';
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('total-spins').innerText = gameState.totalSpins;
+            document.getElementById('total-wins').innerText = gameState.totalWins;
+            const winRate = gameState.totalSpins > 0 
+                ? Math.round((gameState.totalWins / gameState.totalSpins) * 100) 
+                : 0;
+            document.getElementById('win-rate').innerText = winRate + '%';
+            document.getElementById('total-bet').innerText = 'Tk ' + gameState.totalBet;
+            document.getElementById('total-winnings').innerText = 'Tk ' + gameState.totalWinnings;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initUI);
+    </script>
+
+</body>
+</html>
